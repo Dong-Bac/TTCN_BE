@@ -1,6 +1,7 @@
 package com.demo.service;
 
 import com.demo.dto.UserDTO;
+import com.demo.exception.ErrorrChangePassword;
 import com.demo.exception.UserAlreadyExistsException;
 import com.demo.model.Role;
 import com.demo.model.User;
@@ -98,6 +99,24 @@ public class UserServiceImpl implements UserService {
 
         return modelMapper.map(savedUser, UserDTO.class);
     }
+
+    @Override
+    public UserDTO changePassword(String email, String oldPassword, String newPassword) {
+        User user = userRepository.findByEmail(email).orElse(null);
+        if (user != null) {
+            if (passwordEncoder.matches(oldPassword, user.getPassword())) {
+                user.setPassword(passwordEncoder.encode(newPassword));
+                userRepository.save(user);
+                return this.modelMapper.map(user, UserDTO.class);
+            } else {
+                throw new ErrorrChangePassword("Incorrect old password");
+            }
+        } else {
+            throw new ErrorrChangePassword("User not found");
+        }
+    }
+
+
     @Transactional
     @Override
     public void deleteUser(String email) {

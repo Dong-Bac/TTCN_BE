@@ -1,6 +1,7 @@
 package com.demo.controller;
 
 
+import com.demo.dto.BookedRoomDTO;
 import com.demo.exception.InvalidBookingRequestException;
 import com.demo.exception.ResourceNotFoundException;
 import com.demo.model.BookedRoom;
@@ -38,11 +39,14 @@ public class BookingController {
     }
 
     @PostMapping("/room/{roomId}/booking")
-    public ResponseEntity<?> saveBooking(@PathVariable Long roomId, @RequestBody BookedRoom bookingRequest) {
-        try {
+    public ResponseEntity<?> saveBooking(@PathVariable Long roomId,
+                                         @RequestBody BookedRoom bookingRequest){
+        try{
             String confirmationCode = bookingService.saveBooking(roomId, bookingRequest);
-            return ResponseEntity.ok("Room booked successfully. Your booking confirmation code is: " + confirmationCode);
-        } catch (InvalidBookingRequestException e) {
+            return ResponseEntity.ok(
+                    "Room booked successfully");
+
+        }catch (InvalidBookingRequestException e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
@@ -76,6 +80,7 @@ public class BookingController {
     private BookingResponse convertToBookingResponse(BookedRoom booking) {
         RoomResponse room = new RoomResponse(
                 booking.getRoom().getId(),
+                booking.getRoom().getRoomname(),
                 booking.getRoom().getRoomtype(),
                 booking.getRoom().getPrice(),
                 booking.getRoom().getDescription()

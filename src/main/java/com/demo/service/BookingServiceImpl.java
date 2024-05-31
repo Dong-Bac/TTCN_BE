@@ -1,5 +1,6 @@
 package com.demo.service;
 
+import com.demo.dto.BookedRoomDTO;
 import com.demo.exception.InvalidBookingRequestException;
 import com.demo.exception.ResourceNotFoundException;
 import com.demo.model.BookedRoom;
@@ -39,20 +40,22 @@ public class BookingServiceImpl implements BookingService{
 
     @Override
     public String saveBooking(Long roomId, BookedRoom bookingRequest) {
-
-        if(bookingRequest.getCheckoutdate().isBefore(bookingRequest.getCheckindate())){
-            throw  new InvalidBookingRequestException("Check-in date must come before check-out date");
+        if (bookingRequest.getCheckoutdate().isBefore(bookingRequest.getCheckindate())){
+            throw new InvalidBookingRequestException("Check-in date must come before check-out date");
         }
-        Room room=roomService.getRoomById(roomId).get();
-        List<BookedRoom> existingBookings=room.getBookings();//lấy tất cả bookedRoom của phòng
-        boolean roomIsAvailable=roomIsAvailable(bookingRequest,existingBookings);
-        if(roomIsAvailable){
+        Room room = roomService.getRoomById(roomId).get();
+        List<BookedRoom> existingBookings = room.getBookings();
+        boolean roomIsAvailable = roomIsAvailable(bookingRequest,existingBookings);
+        if (roomIsAvailable){
             room.addBooking(bookingRequest);
+            bookingRepository.save(bookingRequest);
         }else{
-            throw new InvalidBookingRequestException("Sorry, This room is not available");
+            throw  new InvalidBookingRequestException("Sorry, This room is not available for the selected dates;");
         }
         return bookingRequest.getConfimationcode();
     }
+
+
 
     @Override
     public BookedRoom findByBookingConfirmationCode(String confirmCode) {
@@ -110,4 +113,6 @@ public class BookingServiceImpl implements BookingService{
                                 && bookingRequest.getCheckoutdate().equals(bookingRequest.getCheckindate()))
                 );
     }
+
+
 }

@@ -1,5 +1,6 @@
 package com.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,7 +17,6 @@ import java.util.random.RandomGenerator;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 public class Room {
 
@@ -29,12 +29,15 @@ public class Room {
     private BigDecimal price;
     private String description;
     private Boolean isBooked = false;
+    @JsonIgnore
     @Lob
     private Blob image;
 
     @OneToMany(mappedBy = "room", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<BookedRoom> bookings;
-
+    public Room() {
+        this.bookings = new ArrayList<>();
+    }
     public void addBooking(BookedRoom booking) {
         if (bookings == null) {
             bookings = new ArrayList<>();

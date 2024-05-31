@@ -1,5 +1,6 @@
 package com.demo.service;
 
+import com.demo.dto.BookedRoomDTO;
 import com.demo.model.BookedRoom;
 
 import java.util.List;

@@ -1,6 +1,7 @@
 package com.demo.controller;
 
 import com.demo.dto.UserDTO;
+import com.demo.exception.ErrorrChangePassword;
 import com.demo.model.User;
 import com.demo.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -64,5 +65,19 @@ public class UserController {
     public ResponseEntity<String> deleteUser(@PathVariable("email") String email) {
         userService.deleteUser(email);
         return ResponseEntity.ok("User deleted successfully");
+    }
+
+    @PutMapping("/changePassword/{email}/{oldPassword}/{newPassword}")
+    public ResponseEntity<UserDTO> changePassword(
+            @PathVariable("email") String email,
+            @PathVariable("oldPassword") String oldPassword,
+            @PathVariable("newPassword") String newPassword) {
+
+        try {
+            UserDTO userDTO = userService.changePassword(email, oldPassword, newPassword);
+            return ResponseEntity.ok(userDTO);
+        } catch (ErrorrChangePassword e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
     }
 }

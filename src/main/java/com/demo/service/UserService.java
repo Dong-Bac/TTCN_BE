@@ -15,4 +15,5 @@ public interface UserService {
     List<UserDTO> getUsers();
     void deleteUser(String email);
     UserDTO updateUser(String email, User user);
+    UserDTO changePassword(String email, String oldPassword, String newPassword);
 }

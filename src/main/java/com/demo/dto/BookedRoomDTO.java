@@ -12,12 +12,10 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookedRoomDTO {
-    private Long bookingId;
     private LocalDate checkindate;
     private LocalDate checkoutdate;
-    private String username;
-    private String email;
-    private int totalguest;
-    private String confimationcode;
-    private RoomDTO room;
+    private String guestName;
+    private String guestEmail;
+    private int numberOfGuests;
+
 }
