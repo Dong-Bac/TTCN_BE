@@ -48,6 +48,11 @@ public class Room {
         isBooked = true;
         String bookingCode = RandomStringUtils.randomNumeric(10);
         booking.setConfimationCode(bookingCode);
+    }
+    public void deleteBooking(BookedRoom booking){
+        bookings.remove(booking);
+        booking.setRoom(null); // Remove the relationship on the other side
+        isBooked = bookings.isEmpty() ? false : true;
 
     }
 

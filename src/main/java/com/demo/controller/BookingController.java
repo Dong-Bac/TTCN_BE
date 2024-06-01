@@ -17,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,11 +40,15 @@ public class BookingController {
         return ResponseEntity.ok(bookingResponses);
     }
 
-    @PostMapping("/room/{roomId}/booking")
-    public ResponseEntity<?> saveBooking(@PathVariable Long roomId,
-                                         @RequestBody BookedRoom bookingRequest){
+    @PostMapping("/room/{roomId}/booking/{checkindate}/{checkoutdate}/{email}/{totalguest}")
+    public ResponseEntity<?> saveBooking(@PathVariable("roomId") Long roomId,
+                                         @PathVariable("checkindate") LocalDate checkindate,
+                                         @PathVariable("checkoutdate") LocalDate checkoutdate,
+                                         @PathVariable("email") String email,
+                                         @PathVariable("totalguest") int totalguest
+                                         ){
         try{
-            String confirmationCode = bookingService.saveBooking(roomId, bookingRequest);
+            String confirmationCode = bookingService.saveBooking(roomId, checkindate, checkoutdate, email, totalguest);
             return ResponseEntity.ok(
                     "Room booked successfully");
 
@@ -62,6 +68,16 @@ public class BookingController {
         }
     }
 
+    @GetMapping("/{bookingId}")
+    public ResponseEntity<?> getBookingByBookingId(@PathVariable("bookingId") Long bookingId ) {
+        try {
+            BookedRoom booking = bookingService.findByBookingId(bookingId);
+            BookingResponse bookingResponse = convertToBookingResponse(booking);
+            return ResponseEntity.ok(bookingResponse);
+        } catch (ResourceNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        }
+    }
     @GetMapping("/user/{email}/bookings")
     public ResponseEntity<List<BookingResponse>> getBookingsByUserEmail(@PathVariable String email) {
         List<BookingResponse> bookingResponses = bookingService.getBookingsByUserEmail(email)

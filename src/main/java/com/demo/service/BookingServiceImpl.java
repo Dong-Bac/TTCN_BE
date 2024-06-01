@@ -8,10 +8,12 @@ import com.demo.model.Room;
 import com.demo.model.User;
 import com.demo.repository.BookingRepository;
 import com.demo.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,10 +29,22 @@ public class BookingServiceImpl implements BookingService{
     @Autowired
     private RoomService roomService;
 
-    @Override
-    public void cancelBooking(Long BookingId) {
-        bookingRepository.deleteById(BookingId);
-
+    public void cancelBooking(Long bookingId) {
+        // Tìm phòng liên quan đến bookingId
+        Room room = bookingRepository.findRoomByBookingId(bookingId);
+        // Tìm BookedRoom theo bookingId
+        Optional<BookedRoom> bookedRoomOptional = bookingRepository.findById(bookingId);
+        // Nếu BookedRoom tồn tại
+        if (bookedRoomOptional.isPresent()) {
+            BookedRoom bookedRoom = bookedRoomOptional.get();
+            // Xóa booking khỏi phòng
+            room.deleteBooking(bookedRoom);
+            // Xóa BookedRoom khỏi cơ sở dữ liệu
+            bookingRepository.deleteById(bookingId);
+        } else {
+            // Xử lý trường hợp không tìm thấy BookedRoom (nếu cần thiết)
+            throw new EntityNotFoundException("Booking with id " + bookingId + " not found");
+        }
     }
 
     @Override
@@ -39,7 +53,8 @@ public class BookingServiceImpl implements BookingService{
     }
 
     @Override
-    public String saveBooking(Long roomId, BookedRoom bookingRequest) {
+    public String saveBooking(Long roomId, LocalDate checkindate, LocalDate checkoutdate,String email, int totalguest) {
+        BookedRoom bookingRequest= new BookedRoom(checkindate, checkoutdate,email, totalguest);
         if (bookingRequest.getCheckoutdate().isBefore(bookingRequest.getCheckindate())){
             throw new InvalidBookingRequestException("Check-in date must come before check-out date");
         }
@@ -62,6 +77,12 @@ public class BookingServiceImpl implements BookingService{
 
         return bookingRepository.findByConfirmationCode(confirmCode).
                 orElseThrow(()-> new ResourceNotFoundException("Not booking found with confirmCode"));
+    }
+
+    @Override
+    public BookedRoom findByBookingId(Long BookingId) {
+        Optional<BookedRoom> bookedRoom=bookingRepository.findById(BookingId);
+        return  bookedRoom.get();
     }
 
     @Override

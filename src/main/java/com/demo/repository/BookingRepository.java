@@ -1,6 +1,7 @@
 package com.demo.repository;
 
 import com.demo.model.BookedRoom;
+import com.demo.model.Room;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,4 +18,7 @@ public interface BookingRepository extends JpaRepository<BookedRoom, Long> {
 
     @Query("SELECT br FROM BookedRoom br WHERE br.email = :email")
     List<BookedRoom> findBookingByGuestEmail(@Param("email") String email);
+
+    @Query("SELECT br.room FROM BookedRoom br WHERE br.id = :bookingId")
+    Room findRoomByBookingId(@Param("bookingId") Long bookingId);
 }

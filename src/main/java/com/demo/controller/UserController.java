@@ -46,15 +46,15 @@ public class UserController {
         return ResponseEntity.ok(employees);
     }
 
-    @GetMapping("/users")
+    @GetMapping("/customer")
     public ResponseEntity<List<UserDTO>> getUsers() {
         List<UserDTO> users = userService.getUsers();
         return ResponseEntity.ok(users);
     }
 
-    @PutMapping("/update/{email}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable("email") String email, @RequestBody User updatedUser) {
-        UserDTO userDto = userService.updateUser(email, updatedUser);
+    @PutMapping("/update/{userName}/{email}/{phoneNumber}")
+    public ResponseEntity<UserDTO> updateUser(@PathVariable("userName") String userName,@PathVariable("email") String email,@PathVariable("phoneNumber") String phoneNumber ) {
+        UserDTO userDto = userService.updateUser(userName,email,phoneNumber);
         if (userDto == null) {
             return ResponseEntity.notFound().build();
         }

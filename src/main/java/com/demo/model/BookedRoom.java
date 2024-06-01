@@ -46,7 +46,12 @@ public class BookedRoom {
     @JoinColumn(name = "user_id")
     private User user;
 
-
+    public BookedRoom(LocalDate checkindate, LocalDate checkoutdate, String email, int totalguest){
+        this.checkindate=checkindate;
+        this.checkoutdate=checkoutdate;
+        this.email=email;
+        this.totalguest=totalguest;
+    }
     public void setConfimationCode(String confimationcode){
         this.confimationcode=confimationcode;
     }

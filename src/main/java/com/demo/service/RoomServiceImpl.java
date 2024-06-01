@@ -111,4 +111,9 @@ public class RoomServiceImpl implements RoomService {
             roomRepository.delete(room.get());
         }
     }
+
+//    @Override
+//    public List<Room> findRoomsByRoomType(String roomType, boolean isBooked) {
+//        return roomRepository.findRoomsByRoomTypeAndIsBooked(roomType, isBooked);
+//    }
 }

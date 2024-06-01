@@ -164,6 +164,53 @@ public class RoomController {
         }
     }
 
+//    @GetMapping("/getRoomByRoomType")
+//    public ResponseEntity<List<RoomResponse>> getRoomByRoomType(@RequestParam("roomType") String roomType) {
+//        try {
+//            List<Room> rooms = roomService.findRoomsByRoomType(roomType,true);
+//            List<RoomResponse> roomResponses = new ArrayList<>();
+//            for (Room room : rooms) {
+//                byte[] photoBytes = roomService.getRoomPhotoByRoomId(room.getId());
+//                RoomResponse roomResponse = getRoomResponse(room);
+//                if (photoBytes != null && photoBytes.length > 0) {
+//                    String photoBase64 = Base64.encodeBase64String(photoBytes);
+//                    roomResponse.setImage(photoBase64);
+//                }
+//                roomResponses.add(roomResponse);
+//            }
+//            if (roomResponses.isEmpty()) {
+//                return ResponseEntity.noContent().build();
+//            } else {
+//                return ResponseEntity.ok(roomResponses);
+//            }
+//        } catch (Exception e) {
+//            throw new ResourceNotFoundException("Room not found"+e);
+//        }
+//    }
+
+//    @GetMapping("/getRoomByRoomType")
+//    public ResponseEntity<List<RoomResponse>> getRoomByRoomType(@RequestParam("roomType") String roomType) {
+//        try {
+//            List<Room> rooms = roomService.findRoomsByRoomType(roomType, true);
+//            List<RoomResponse> roomResponses = new ArrayList<>();
+//            for (Room room : rooms) {
+//                byte[] photoBytes = roomService.getRoomPhotoByRoomId(room.getId());
+//                RoomResponse roomResponse = getRoomResponse(room);
+//                if (photoBytes != null && photoBytes.length > 0) {
+//                    String photoBase64 = Base64.encodeBase64String(photoBytes);
+//                    roomResponse.setImage(photoBase64);
+//                }
+//                roomResponses.add(roomResponse);
+//            }
+//            if (roomResponses.isEmpty()) {
+//                return ResponseEntity.noContent().build();
+//            } else {
+//                return ResponseEntity.ok(roomResponses);
+//            }
+//        } catch (Exception e) {
+//            throw new ResourceNotFoundException("Room not found" + e);
+//        }
+//    }
     public RoomResponse getRoomResponse(Room room) {
         List<BookedRoom> bookings = bookingService.getAllBookingsByRoomId(room.getId());
         List<BookingResponse> bookingInfo = bookings.stream()
@@ -183,4 +230,6 @@ public class RoomController {
         return new RoomResponse(room.getId(), room.getRoomname(), room.getRoomtype(), room.getPrice(),
                 room.getDescription(), room.getIsBooked(), photoBytes, bookingInfo);
     }
+
+
 }

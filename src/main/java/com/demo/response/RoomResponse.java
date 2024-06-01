@@ -25,8 +25,8 @@ public class RoomResponse {
     private List<BookingResponse> bookings;
     public RoomResponse(Long id,String roomname, String roomtype, BigDecimal price,String description){
         this.id=id;
+        this.roomname=roomname;
         this.roomtype=roomtype;
-        this.roomtype=roomname;
         this.price= price;
         this.description=description;
     }

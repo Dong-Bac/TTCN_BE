@@ -77,24 +77,16 @@ public class UserServiceImpl implements UserService {
         return userDto;
     }
     @Override
-    public UserDTO updateUser (String email, User updatedUser) {
+    public UserDTO updateUser (String userName, String email, String phoneNumber) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
         if (!optionalUser.isPresent()) {
             return null; // Or throw an exception if preferred
         }
 
         User user = optionalUser.get();
-        user.setUsername(updatedUser.getUsername());
-        user.setAddress(updatedUser.getAddress());
-        user.setAge(updatedUser.getAge());
-        user.setPhoneNumber(updatedUser.getPhoneNumber());
-        user.setAvatar(updatedUser.getAvatar());
-
-        // Kiểm tra xem có cần mã hóa lại mật khẩu hay không
-        if (!updatedUser.getPassword().equals(user.getPassword())) {
-            String hashedPassword = passwordEncoder.encode(updatedUser.getPassword());
-            user.setPassword(hashedPassword);
-        }
+        user.setUsername(userName);
+        user.setEmail(email);
+        user.setPhoneNumber(phoneNumber);
         User savedUser = userRepository.save(user);
 
         return modelMapper.map(savedUser, UserDTO.class);

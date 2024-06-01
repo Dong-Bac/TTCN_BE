@@ -20,4 +20,5 @@ public interface RoomService {
     List<Room> getAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate, String roomType);
     Room updateRoom(Long roomId, String roomName, String roomType, BigDecimal roomPrice, String description, byte[] photoBytes);
     void deleteRoom(Long roomId);
+//    List<Room> findRoomsByRoomType(String roomType, boolean ischeck);
 }
