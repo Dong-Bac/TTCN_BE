@@ -93,6 +93,7 @@ public class BookingController {
     private BookingResponse convertToBookingResponse(BookedRoom booking) {
         RoomResponse room = new RoomResponse(
                 booking.getRoom().getId(),
+                booking.getRoom().getRoomnumber(),
                 booking.getRoom().getRoomname(),
                 booking.getRoom().getRoomtype(),
                 booking.getRoom().getPrice(),
