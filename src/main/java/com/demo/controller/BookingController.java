@@ -45,14 +45,11 @@ public class BookingController {
                                          @PathVariable("checkindate") LocalDate checkindate,
                                          @PathVariable("checkoutdate") LocalDate checkoutdate,
                                          @PathVariable("email") String email,
-                                         @PathVariable("totalguest") int totalguest
-                                         ){
-        try{
+                                         @PathVariable("totalguest") int totalguest) {
+        try {
             String confirmationCode = bookingService.saveBooking(roomId, checkindate, checkoutdate, email, totalguest);
-            return ResponseEntity.ok(
-                    "Room booked successfully");
-
-        }catch (InvalidBookingRequestException e){
+            return ResponseEntity.ok("Room booked successfully");
+        } catch (InvalidBookingRequestException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

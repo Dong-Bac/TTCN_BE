@@ -23,12 +23,11 @@ public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private int roomnumber;
+    private String roomnumber;
     private String roomname;
     private String roomtype;
     private BigDecimal price;
     private String description;
-    private Boolean isBooked = false;
     @JsonIgnore
     @Lob
     private Blob image;
@@ -45,14 +44,12 @@ public class Room {
 
         bookings.add(booking);
         booking.setRoom(this);
-        isBooked = true;
         String bookingCode = RandomStringUtils.randomNumeric(10);
         booking.setConfimationCode(bookingCode);
     }
     public void deleteBooking(BookedRoom booking){
         bookings.remove(booking);
         booking.setRoom(null); // Remove the relationship on the other side
-        isBooked = bookings.isEmpty() ? false : true;
 
     }
 

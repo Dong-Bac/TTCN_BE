@@ -29,7 +29,7 @@ public class RoomServiceImpl implements RoomService {
     private RoomRepository roomRepository;
 
     @Override
-    public Room addNewRoom(MultipartFile file, String roomName, String roomType, BigDecimal roomPrice, String description) throws SQLException, IOException {
+    public Room addNewRoom(MultipartFile file,String roomNumber, String roomName, String roomType, BigDecimal roomPrice, String description) throws SQLException, IOException {
         // Kiểm tra xem roomname đã tồn tại trong cơ sở dữ liệu chưa
         Room existingRoom = roomRepository.findByRoomname(roomName);
         if (existingRoom != null) {
@@ -42,6 +42,7 @@ public class RoomServiceImpl implements RoomService {
         room.setPrice(roomPrice);
         room.setDescription(description); // Set description
         room.setRoomname(roomName);
+        room.setRoomnumber(roomNumber);
 
         if (!file.isEmpty()) {
             byte[] photoBytes = file.getBytes(); // Chuyển nội dung của "MultipartFile" thành một mảng byte
@@ -85,9 +86,10 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public Room updateRoom(Long roomId, String roomName, String roomType, BigDecimal roomPrice, String description, byte[] photoBytes) {
+    public Room updateRoom(Long roomId,String roomNumber, String roomName, String roomType, BigDecimal roomPrice, String description, byte[] photoBytes) {
         Room room=roomRepository.findById(roomId).get();
 
+        if(roomNumber!=null) room.setRoomname(roomNumber);
         if(roomName!=null) room.setRoomname(roomName);
         if(roomType!=null) room.setRoomtype(roomType);
         if(roomPrice!=null) room.setPrice(roomPrice);

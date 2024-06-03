@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -29,20 +30,15 @@ public class BookingServiceImpl implements BookingService{
     @Autowired
     private RoomService roomService;
 
+    @Override
     public void cancelBooking(Long bookingId) {
-        // Tìm phòng liên quan đến bookingId
         Room room = bookingRepository.findRoomByBookingId(bookingId);
-        // Tìm BookedRoom theo bookingId
         Optional<BookedRoom> bookedRoomOptional = bookingRepository.findById(bookingId);
-        // Nếu BookedRoom tồn tại
         if (bookedRoomOptional.isPresent()) {
             BookedRoom bookedRoom = bookedRoomOptional.get();
-            // Xóa booking khỏi phòng
             room.deleteBooking(bookedRoom);
-            // Xóa BookedRoom khỏi cơ sở dữ liệu
             bookingRepository.deleteById(bookingId);
         } else {
-            // Xử lý trường hợp không tìm thấy BookedRoom (nếu cần thiết)
             throw new EntityNotFoundException("Booking with id " + bookingId + " not found");
         }
     }
@@ -53,23 +49,24 @@ public class BookingServiceImpl implements BookingService{
     }
 
     @Override
-    public String saveBooking(Long roomId, LocalDate checkindate, LocalDate checkoutdate,String email, int totalguest) {
-        BookedRoom bookingRequest= new BookedRoom(checkindate, checkoutdate,email, totalguest);
-        if (bookingRequest.getCheckoutdate().isBefore(bookingRequest.getCheckindate())){
+    public String saveBooking(Long roomId, LocalDate checkindate, LocalDate checkoutdate, String email, int totalguest) {
+        BookedRoom bookingRequest = new BookedRoom(checkindate, checkoutdate, email, totalguest);
+        if (bookingRequest.getCheckoutdate().isBefore(bookingRequest.getCheckindate())) {
             throw new InvalidBookingRequestException("Check-in date must come before check-out date");
         }
-        Room room = roomService.getRoomById(roomId).get();
+        Room room = roomService.getRoomById(roomId).orElseThrow(() ->
+                new ResourceNotFoundException("Room not found with ID " + roomId)
+        );
         List<BookedRoom> existingBookings = room.getBookings();
-        boolean roomIsAvailable = roomIsAvailable(bookingRequest,existingBookings);
-        if (roomIsAvailable){
+        boolean roomIsAvailable = roomIsAvailable(bookingRequest, existingBookings);
+        if (roomIsAvailable) {
             room.addBooking(bookingRequest);
             bookingRepository.save(bookingRequest);
-        }else{
-            throw  new InvalidBookingRequestException("Sorry, This room is not available for the selected dates;");
+        } else {
+            throw new InvalidBookingRequestException("Sorry, This room is not available for the selected dates;");
         }
         return bookingRequest.getConfimationcode();
     }
-
 
 
     @Override
@@ -116,24 +113,20 @@ public class BookingServiceImpl implements BookingService{
     private boolean roomIsAvailable(BookedRoom bookingRequest, List<BookedRoom> existingBookings) {
         return existingBookings.stream()
                 .noneMatch(existingBooking ->
-                        bookingRequest.getCheckindate().equals(existingBooking.getCheckindate())
-                                || bookingRequest.getCheckoutdate().isBefore(existingBooking.getCheckoutdate())
-                                || (bookingRequest.getCheckindate().isAfter(existingBooking.getCheckindate())
-                                && bookingRequest.getCheckoutdate().isBefore(existingBooking.getCheckoutdate()))
-                                || (bookingRequest.getCheckindate().isBefore(existingBooking.getCheckindate())
-
-                                && bookingRequest.getCheckoutdate().equals(existingBooking.getCheckoutdate()))
-                                || (bookingRequest.getCheckindate().isBefore(existingBooking.getCheckindate())
-
-                                && bookingRequest.getCheckoutdate().isAfter(existingBooking.getCheckoutdate()))
-
-                                || (bookingRequest.getCheckindate().equals(existingBooking.getCheckoutdate())
-                                && bookingRequest.getCheckoutdate().equals(existingBooking.getCheckindate()))
-
-                                || (bookingRequest.getCheckindate().equals(existingBooking.getCheckoutdate())
-                                && bookingRequest.getCheckoutdate().equals(bookingRequest.getCheckindate()))
+                        (bookingRequest.getCheckindate().isBefore(existingBooking.getCheckoutdate()) &&
+                                bookingRequest.getCheckoutdate().isAfter(existingBooking.getCheckindate()))
                 );
     }
 
+    public void cancelExpiredBookings(){
+        LocalDate today=LocalDate.now();
+        List<BookedRoom> expiredBookings=bookingRepository.findAll().stream()
+                .filter(booking->booking.getCheckoutdate().isBefore(today))
+                .collect(Collectors.toList());
+        for (BookedRoom booking : expiredBookings) {
+            cancelBooking(booking.getBookingId());
+        }
+
+    }
 
 }

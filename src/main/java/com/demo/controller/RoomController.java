@@ -42,14 +42,15 @@ public class RoomController {
     @PostMapping("/add/new-room")
     public ResponseEntity<RoomResponse> addNewRoom(
             @RequestParam("photo") MultipartFile photo,
+            @RequestParam("roomNumber") String roomNumber,
             @RequestParam("roomName") String roomName,
             @RequestParam("roomType") String roomType,
             @RequestParam("roomPrice") BigDecimal roomPrice,
             @RequestParam("description") String description) throws SQLException, IOException {
 
         // Assuming that addNewRoom method takes description as a parameter
-        Room savedRoom = roomService.addNewRoom(photo,roomName, roomType, roomPrice, description);
-        RoomResponse response = new RoomResponse(savedRoom.getId(), savedRoom.getRoomname(), savedRoom.getRoomtype(), savedRoom.getPrice(), savedRoom.getDescription());
+        Room savedRoom = roomService.addNewRoom(photo,roomNumber,roomName, roomType, roomPrice, description);
+        RoomResponse response = new RoomResponse(savedRoom.getId(),savedRoom.getRoomnumber(), savedRoom.getRoomname(), savedRoom.getRoomtype(), savedRoom.getPrice(), savedRoom.getDescription());
         return ResponseEntity.ok(response);
     }
     @GetMapping("/room-types")
@@ -73,6 +74,7 @@ public class RoomController {
     @PutMapping("/update/{roomId}")
     public ResponseEntity<Room> updateRoom(@PathVariable("roomId") Long roomId,
                                            @RequestParam(required = false) MultipartFile photo,
+                                           @RequestParam(required = false) String roomNumber,
                                            @RequestParam(required = false) String roomName,
                                            @RequestParam(required = false) String roomType,
                                            @RequestParam(required = false) BigDecimal roomPrice,
@@ -81,7 +83,7 @@ public class RoomController {
         byte[] photoBytes=photo!=null &&!photo.isEmpty()?
                 photo.getBytes(): roomService.getRoomPhotoByRoomId(roomId);
         Blob photoBlob=photoBytes!=null&& photoBytes.length>0 ? new SerialBlob(photoBytes):null;
-        Room theRoom=roomService.updateRoom(roomId,roomName, roomType, roomPrice, description, photoBytes);
+        Room theRoom=roomService.updateRoom(roomId,roomNumber,roomName, roomType, roomPrice, description, photoBytes);
         theRoom.setImage(photoBlob);
         RoomResponse roomResponse= new RoomResponse();
         return ResponseEntity.ok(theRoom);
@@ -226,9 +228,8 @@ public class RoomController {
                 throw new PhotoRetrievalException("Error retrieving photo");
             }
         }
-
-        return new RoomResponse(room.getId(), room.getRoomname(), room.getRoomtype(), room.getPrice(),
-                room.getDescription(), room.getIsBooked(), photoBytes, bookingInfo);
+        return new RoomResponse(room.getId(),room.getRoomnumber(), room.getRoomname(), room.getRoomtype(), room.getPrice(),
+                room.getDescription(), photoBytes, bookingInfo);
     }
 
 

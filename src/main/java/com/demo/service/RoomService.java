@@ -12,13 +12,13 @@ import java.util.Optional;
 
 public interface RoomService {
 
-    Room addNewRoom(MultipartFile file,String roomName, String roomType, BigDecimal roomPrice, String description) throws SQLException, IOException;
+    Room addNewRoom(MultipartFile file,String roomNumber,String roomName, String roomType, BigDecimal roomPrice, String description) throws SQLException, IOException;
     List<Room> getAllRoom();
     Optional<Room> getRoomById(Long roomId);
     List<String> getAllRoomTypes();
     byte[] getRoomPhotoByRoomId(Long roomId) throws SQLException;
     List<Room> getAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate, String roomType);
-    Room updateRoom(Long roomId, String roomName, String roomType, BigDecimal roomPrice, String description, byte[] photoBytes);
+    Room updateRoom(Long roomId,String roomNumber, String roomName, String roomType, BigDecimal roomPrice, String description, byte[] photoBytes);
     void deleteRoom(Long roomId);
 //    List<Room> findRoomsByRoomType(String roomType, boolean ischeck);
 }
